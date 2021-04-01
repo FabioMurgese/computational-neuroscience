@@ -4,9 +4,9 @@ clear variables;
 data = readtable('../lab2_1_data.csv');  % importing data as table
 U = table2array(data);  % converting table into input array
 U_size = size(U,2);  % training set dimension
-eta = 10e-6;  % learning rate
+eta = 10e-7;  % learning rate
 epochs=1000;  % iterations
-theta = 10e-6;  % threshold for early stopping
+theta = 10e-7;  % threshold for early stopping
 Q = U'*U;  % input correlation matrix
 W_t = zeros(2, epochs);
 
@@ -17,7 +17,7 @@ w_norm = norm(W);
 for i = 1:epochs
     U = U(:,randperm(U_size));  % reshuffling dataset
     
-    for n = 1:U_size
+    for n = 1:U(:,U_size)
         % linear firing model
         v = W' * U(:,n);  % compute output
         delta_W = eta * v  * U(:,n);
@@ -32,7 +32,7 @@ for i = 1:epochs
     diff = w_norm_new - w_norm;
     w_norm = w_norm_new;
     
-    fprintf('Epoch: %d Norm(W): %1.5f Diff: %1.7f Theta: %1.7f \n', i, w_norm, diff, theta)
+    fprintf('Epoch: %d Norm(W): %1.5f', i, w_norm)
     
     if diff < theta
         break;
@@ -82,5 +82,3 @@ xlabel('time')
 ylabel('weight')
 title('Weight norm vector time evolution')
 print(fig,'P2.3.png','-dpng')
-
-save('W_t.mat','W_t');

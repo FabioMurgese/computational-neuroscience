@@ -1,11 +1,12 @@
-%%%%%%%%%%%%%%% Learning using Hebb Rule %%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Learning using Oja Rule %%%%%%%%%%%%%%%
 clear variables;
 
 data = readtable('../lab2_1_data.csv');  % importing data as table
 U = table2array(data);  % converting table into input array
 U_size = size(U,2);  % training set dimension
-eta = 10e-6;  % learning rate
+eta = 10e-7;  % learning rate
 epochs=1000;  % iterations
+alpha = 10e-4;  % 
 theta = 10e-6;  % threshold for early stopping
 Q = U'*U;  % input correlation matrix
 W_t = zeros(2, epochs);
@@ -20,8 +21,8 @@ for i = 1:epochs
     for n = 1:U_size
         % linear firing model
         v = W' * U(:,n);  % compute output
-        delta_W = eta * v  * U(:,n);
-        W = W + delta_W;  % update weights
+        delta_W = v * U(:,n) - (alpha * v^2 * W);  % Oja delta
+        W = W + eta * delta_W;  % update weights
     end
     
     W_norm(i) = w_norm;
