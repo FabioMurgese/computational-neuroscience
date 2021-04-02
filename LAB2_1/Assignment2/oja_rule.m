@@ -20,8 +20,9 @@ for i = 1:epochs
     
     for n = 1:U_size
         % linear firing model
-        v = W' * U(:,n);  % compute output
-        delta_W = v * U(:,n) - (alpha * v^2 * W);  % Oja delta
+        u = U(:,n);
+        v = W' * u;  % compute output
+        delta_W = v * u - (alpha * v^2 * W);  % Oja delta
         W = W + eta * delta_W;  % update weights
     end
     
