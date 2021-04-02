@@ -40,11 +40,7 @@ end
 
 [eigvecs, D] = eig(Q);  % computing eigenvalues and diagonal matrix of Q
 eigvals = diag(D);  % storing eigenvalues in a separated array
-%[d, ind] = sort(eigvals);
-%EV = eigvecs(:,ind);
-%ev = EV(:,1);
-
-[max_eigval, max_i] = max(eigvals);  % take the principal eigenvector
+[max_eigval, max_i] = max(eigvals);  % take the principal eigenvector index
 
 % Plotting data points and comparison between final weight vector and
 % principal eigenvector of Q
@@ -52,7 +48,6 @@ fig = figure;
 hold on
 plot(U(1,:),U(2,:), '.')
 plotv(eigvecs(:,max_i));
-%plotv(ev);
 set(findall(gca,'Type', 'Line'),'LineWidth',1.75);
 plotv(w/norm(w))
 legend('data points','principal eigenvector','weight vector','Location', 'best')
@@ -60,7 +55,7 @@ title('P1: data points, final weight vector and principal eigenvector of Q');
 print(fig,'P1.png','-dpng')
 
 
-x=(1:1:epochs);  % epochs time array
+x=(1:1:length(weights));  % epochs time array
 % weight over time, first component
 fig = figure;
 plot(x, weights(1,:));
@@ -77,7 +72,7 @@ ylabel('weight')
 title('Weight vector over time (2nd component)')
 print(fig,'P2.2.png','-dpng')
 
-% weight norm evolution
+% weight norm over time
 fig = figure;
 plot(x, W_norm)
 xlabel('time')
