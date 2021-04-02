@@ -49,7 +49,6 @@ fig = figure;
 hold on
 plot(U(1,:),U(2,:), '.')
 plotv(eigvecs(:,max_i));
-%plotv(ev);
 set(findall(gca,'Type', 'Line'),'LineWidth',1.75);
 plotv(w/norm(w))
 legend('data points','principal eigenvector','weight vector','Location', 'best')
@@ -83,5 +82,3 @@ title('Weight norm vector over time')
 print(fig,'P2.3.png','-dpng')
 
 save('weights.mat','weights');
-
-

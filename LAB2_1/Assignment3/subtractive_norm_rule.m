@@ -4,86 +4,82 @@ clear variables;
 data = readtable('../lab2_1_data.csv');  % importing data as table
 U = table2array(data);  % converting table into input array
 U_size = size(U,2);  % training set dimension
-eta = 10e-6;  % learning rate
+eta = 5*10e-5;  % learning rate
 epochs=1000;  % iterations
 theta = 10e-6;  % threshold for early stopping
-Q = U'*U;  % input correlation matrix
-W_t = zeros(2, epochs);
+Q = U*U';  % input correlation matrix
 Nu = size(U,1);
 ns = ones(1,Nu);
+weights = [];
 
-W = -1 + (1+1)*rand(2,1);  % random weights initialization
-W_norm = zeros(1, epochs);
-w_norm = norm(W);
+w = -1 + 2.*rand(2,1);  % random weights initialization
+W_norm = [];
 
 for i = 1:epochs
     U = U(:,randperm(U_size));  % reshuffling dataset
+    w_norm = norm(w);
     
     for n = 1:U_size
         % linear firing model
         u = U(:,n);
-        v = W' * u;  % compute output
-        delta_W = (v * u) - ((v * (ns * u) * ns')/ Nu);
-        W = W + eta * delta_W;  % update weights
+        v = w' * u;  % compute output
+        delta_w = (v * u) - ((v * (ns * u) * ns')/ Nu);
+        w = w + eta * delta_w;  % update weights
     end
     
-    W_norm(i) = w_norm;
-    w_norm_new = norm(W);
-    W_out = W/norm(W);
-    W_t(:,i) = W_out;
+    weights(:,i) = w/norm(w);
     
+    w_norm_new = norm(w);
+    W_norm = [W_norm; w_norm_new];
     diff = w_norm_new - w_norm;
-    w_norm = w_norm_new;
     
     fprintf('Epoch: %d Norm(W): %1.5f Diff: %1.7f Theta: %1.7f \n', i, w_norm, diff, theta)
     
-    if diff < theta
+    if diff < theta  % stop condition
         break;
     end    
 end
 
-[EV, D] = eig(Q);  % computing eigenvalues and eigenvectors of Q
-[d, ind] = sort(diag(D));  % sort eigenvectors
-EV = EV(:,ind);
-ev = EV(:,1);  % take the principal eigenvector
+[eigvecs, D] = eig(Q);  % computing eigenvalues and diagonal matrix of Q
+eigvals = diag(D);  % storing eigenvalues in a separated array
+[max_eigval, max_i] = max(eigvals);  % take the principal eigenvector index
 
 % Plotting data points and comparison between final weight vector and
 % principal eigenvector of Q
 fig = figure;
-scatter(U(1,:),U(2,:), '.')
 hold on
-plotv(ev);
+plot(U(1,:),U(2,:), '.')
+plotv(eigvecs(:,max_i));
 set(findall(gca,'Type', 'Line'),'LineWidth',1.75);
-plotv(W)
-hold off
+plotv(w/norm(w))
 legend('data points','principal eigenvector','weight vector','Location', 'best')
 title('P1: data points, final weight vector and principal eigenvector of Q');
 print(fig,'P1.png','-dpng')
 
 
-x=(1:1:epochs);
-% weight evolution, first component
+x=(1:1:length(weights));  % epochs time array
+% weight over time, first component
 fig = figure;
-plot(x, W_t(1,:));
+plot(x, weights(1,:));
 xlabel('time')
 ylabel('weight')
-title('Weight vector time evolution (1st component)')
+title('Weight vector over time (1st component)')
 print(fig,'P2.1.png','-dpng')
 
-% weight evolution, second component
+% weight over time, second component
 fig = figure;
-plot(x, W_t(2,:))
+plot(x, weights(2,:))
 xlabel('time')
 ylabel('weight')
-title('Weight vector time evolution (2nd component)')
+title('Weight vector over time (2nd component)')
 print(fig,'P2.2.png','-dpng')
 
-% weight norm evolution
+% weight norm over time
 fig = figure;
 plot(x, W_norm)
 xlabel('time')
 ylabel('weight')
-title('Weight norm vector time evolution')
+title('Weight norm vector over time')
 print(fig,'P2.3.png','-dpng')
 
-save('W_t.mat','W_t');
+save('weights.mat','weights');
