@@ -4,7 +4,7 @@
 
 clear variables;
 
-a=-0.026;  b=-1;  c=-45;  d=-2;
+a=-0.026;  b=-1;  c=-45;  d=-0.7;
 j=0.04;  k=5;  l=140;
 r=false;
 
@@ -26,16 +26,11 @@ for t=tspan
         I=75;
     end
     
-    [u, w, du, dw] = izhikevich(a, b, c, d, j, k, l, u, w, I, tau, r);
+    [u, w, du, dw, ud, wd] = izhikevich(a, b, c, d, j, k, l, u, w, I, tau, r);
+    udot(end+1)=ud;
+    wdot(end+1)=wd;
     grad_u(end+1)=du;
     grad_w(end+1)=dw;
-    
-    if u > 30  % not a threshold, but the peak of the spike
-        udot(end+1)=30;
-    else
-        udot(end+1)=u;
-    end
-    wdot(end+1)=w;
 end
 
 % plot membrane potential

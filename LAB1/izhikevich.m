@@ -9,7 +9,11 @@
 % I: synaptic currents or injected dc-currents
 % r: flag to distinguish (R) accomodation feature
 
-function [u, w, du, dw] = izhikevich(a, b, c, d, j, k, l, u, w, I, tau, r)
+function [u, w, du, dw, udot, wdot] = izhikevich(a, b, c, d, j, k, l, u, w, I, tau, r)
+    
+    udot=[]; 
+    wdot=[];
+    
     if r==true
         du = j*u^2+k*u+l-w+I;
         dw = a*(b*(u+65));
@@ -23,7 +27,11 @@ function [u, w, du, dw] = izhikevich(a, b, c, d, j, k, l, u, w, I, tau, r)
     
     % after-spike resetting
     if u > 30  % not a threshold, but the peak of the spike
+        udot(end+1)=30;
         u = c;
         w = w + d;
+    else
+        udot(end+1)=u;
     end
+    wdot(end+1)=w;
 end
