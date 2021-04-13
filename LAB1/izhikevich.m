@@ -15,15 +15,16 @@ function [u, w, du, dw, udot, wdot] = izhikevich(a, b, c, d, j, k, l, u, w, I, t
     wdot=[];
     
     if r==true
+        u = u + tau*(j*u^2+k*u+l-w+I);
+        w = w + tau*a*(b*(u+65));
         du = j*u^2+k*u+l-w+I;
         dw = a*(b*(u+65));
     else
+        u = u + tau*(j*u^2+k*u+l-w+I);
+        w = w + tau*a*(b*u-w);
         du = j*u^2+k*u+l-w+I;
         dw = a*(b*u-w);
     end
-    
-    u = u + tau*du;
-    w = w + tau*dw;
     
     % after-spike resetting
     if u > 30  % not a threshold, but the peak of the spike
