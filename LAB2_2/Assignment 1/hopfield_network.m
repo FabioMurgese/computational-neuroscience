@@ -177,6 +177,265 @@ imagesc([reshape(d0_3,32,32) reshape(d_0_3,32,32)])
 title(sprintf('Pattern 0 reconstructed (hamming distance=%d)',hamming_distance(d_0_3, p0)));
 print(fig,'img/distorted_0_3_reconstructed.png','-dpng');
 
+
+% pattern 1 (d_1_1)
+while(true)
+    % permuting the neurons for random update
+    idxs = randperm(size(W,2));
+    for i = idxs
+        d_1_1(i) = sign(W(i,:) * d_1_1' + I(i));
+        d_1_1_overlap_p0(end+1) = overlap(p0,d_1_1);
+        d_1_1_overlap_p1(end+1) = overlap(p1,d_1_1);
+        d_1_1_overlap_p2(end+1) = overlap(p2,d_1_1);
+        d_1_1_energy(end+1) = energy(W, d_1_1, I);
+    end
+    
+    d_1_1_energy_new = energy(W, d_1_1, I);
+    if abs(d_1_1_energy_new - d_1_1_energy_old) < eps
+        break;
+    end
+    d_1_1_energy_old = d_1_1_energy_new;
+end
+
+% plots pattern 1 (d_1_1)
+fig = figure;
+hold on;
+plot((1:size(d_1_1_overlap_p0,2)),d_1_1_overlap_p0);
+plot((1:size(d_1_1_overlap_p1,2)),d_1_1_overlap_p1);
+plot((1:size(d_1_1_overlap_p2,2)),d_1_1_overlap_p2);
+title('Overlaps (pattern 1)');
+xlabel('time')
+ylabel('overlap');
+legend('pattern 0','pattern 1','pattern 2');
+print(fig,'img/distorted_1_1_overlap.png','-dpng');
+hold off;
+fig = figure;
+plot((1:size(d_1_1_energy,2)),d_1_1_energy);
+title('Energy function (pattern 1)');
+xlabel('time')
+ylabel('energy function');
+print(fig,'img/distorted_1_1_energy.png','-dpng');
+fig = figure;
+imagesc([reshape(d1_1,32,32) reshape(d_1_1,32,32)])
+title(sprintf('Pattern 1 reconstructed (hamming distance=%d)',hamming_distance(d_1_1, p1)));
+print(fig,'img/distorted_1_1_reconstructed.png','-dpng');
+
+
+% pattern 1 (d_1_2)
+while(true)
+    % permuting the neurons for random update
+    idxs = randperm(size(W,2));
+    for i = idxs
+        d_1_2(i) = sign(W(i,:) * d_1_2' + I(i));
+        d_1_2_overlap_p0(end+1) = overlap(p0,d_1_2);
+        d_1_2_overlap_p1(end+1) = overlap(p1,d_1_2);
+        d_1_2_overlap_p2(end+1) = overlap(p2,d_1_2);
+        d_1_2_energy(end+1) = energy(W, d_1_2, I);
+    end
+    
+    d_1_2_energy_new = energy(W, d_1_2, I);
+    if abs(d_1_2_energy_new - d_1_2_energy_old) < eps
+        break;
+    end
+    d_1_2_energy_old = d_1_2_energy_new;
+end
+
+% plots pattern 1 (d_1_2)
+fig = figure;
+hold on;
+plot((1:size(d_1_2_overlap_p0,2)),d_1_2_overlap_p0);
+plot((1:size(d_1_2_overlap_p1,2)),d_1_2_overlap_p1);
+plot((1:size(d_1_2_overlap_p2,2)),d_1_2_overlap_p2);
+title('Overlaps (pattern 1)');
+xlabel('time')
+ylabel('overlap');
+legend('pattern 0','pattern 1','pattern 2');
+print(fig,'img/distorted_1_2_overlap.png','-dpng');
+hold off;
+fig = figure;
+plot((1:size(d_1_2_energy,2)),d_1_2_energy);
+title('Energy function (pattern 1)');
+xlabel('time')
+ylabel('energy function');
+print(fig,'img/distorted_1_2_energy.png','-dpng');
+fig = figure;
+imagesc([reshape(d1_2,32,32) reshape(d_1_2,32,32)])
+title(sprintf('Pattern 1 reconstructed (hamming distance=%d)',hamming_distance(d_1_2, p1)));
+print(fig,'img/distorted_1_2_reconstructed.png','-dpng');
+
+
+% pattern 1 (d_1_3)
+while(true)
+    % permuting the neurons for random update
+    idxs = randperm(size(W,2));
+    for i = idxs
+        d_1_3(i) = sign(W(i,:) * d_1_3' + I(i));
+        d_1_3_overlap_p0(end+1) = overlap(p0,d_1_3);
+        d_1_3_overlap_p1(end+1) = overlap(p1,d_1_3);
+        d_1_3_overlap_p2(end+1) = overlap(p2,d_1_3);
+        d_1_3_energy(end+1) = energy(W, d_1_3, I);
+    end
+    
+    d_1_3_energy_new = energy(W, d_1_3, I);
+    if abs(d_1_3_energy_new - d_1_3_energy_old) < eps
+        break;
+    end
+    d_1_3_energy_old = d_1_3_energy_new;
+end
+
+% plots pattern 1 (d_1_3)
+fig = figure;
+hold on;
+plot((1:size(d_1_3_overlap_p0,2)),d_1_3_overlap_p0);
+plot((1:size(d_1_3_overlap_p1,2)),d_1_3_overlap_p1);
+plot((1:size(d_1_3_overlap_p2,2)),d_1_3_overlap_p2);
+title('Overlaps (pattern 1)');
+xlabel('time')
+ylabel('overlap');
+legend('pattern 0','pattern 1','pattern 2');
+print(fig,'img/distorted_1_3_overlap.png','-dpng');
+hold off;
+fig = figure;
+plot((1:size(d_1_3_energy,2)),d_1_3_energy);
+title('Energy function (pattern 1)');
+xlabel('time')
+ylabel('energy function');
+print(fig,'img/distorted_1_3_energy.png','-dpng');
+fig = figure;
+imagesc([reshape(d1_3,32,32) reshape(d_1_3,32,32)])
+title(sprintf('Pattern 1 reconstructed (hamming distance=%d)',hamming_distance(d_1_3, p1)));
+print(fig,'img/distorted_1_3_reconstructed.png','-dpng');
+
+
+% pattern 2 (d_2_1)
+while(true)
+    % permuting the neurons for random update
+    idxs = randperm(size(W,2));
+    for i = idxs
+        d_2_1(i) = sign(W(i,:) * d_2_1' + I(i));
+        d_2_1_overlap_p0(end+1) = overlap(p0,d_2_1);
+        d_2_1_overlap_p1(end+1) = overlap(p1,d_2_1);
+        d_2_1_overlap_p2(end+1) = overlap(p2,d_2_1);
+        d_2_1_energy(end+1) = energy(W, d_2_1, I);
+    end
+    
+    d_2_1_energy_new = energy(W, d_2_1, I);
+    if abs(d_2_1_energy_new - d_2_1_energy_old) < eps
+        break;
+    end
+    d_2_1_energy_old = d_2_1_energy_new;
+end
+
+% plots pattern 2 (d_2_1)
+fig = figure;
+hold on;
+plot((1:size(d_2_1_overlap_p0,2)),d_2_1_overlap_p0);
+plot((1:size(d_2_1_overlap_p1,2)),d_2_1_overlap_p1);
+plot((1:size(d_2_1_overlap_p2,2)),d_2_1_overlap_p2);
+title('Overlaps (pattern 2)');
+xlabel('time')
+ylabel('overlap');
+legend('pattern 0','pattern 1','pattern 2');
+print(fig,'img/distorted_2_1_overlap.png','-dpng');
+hold off;
+fig = figure;
+plot((1:size(d_2_1_energy,2)),d_2_1_energy);
+title('Energy function (pattern 2)');
+xlabel('time')
+ylabel('energy function');
+print(fig,'img/distorted_2_1_energy.png','-dpng');
+fig = figure;
+imagesc([reshape(d2_1,32,32) reshape(d_2_1,32,32)])
+title(sprintf('Pattern 2 reconstructed (hamming distance=%d)',hamming_distance(d_2_1, p2)));
+print(fig,'img/distorted_2_1_reconstructed.png','-dpng');
+
+
+% pattern 2 (d_2_2)
+while(true)
+    % permuting the neurons for random update
+    idxs = randperm(size(W,2));
+    for i = idxs
+        d_2_2(i) = sign(W(i,:) * d_2_2' + I(i));
+        d_2_2_overlap_p0(end+1) = overlap(p0,d_2_2);
+        d_2_2_overlap_p1(end+1) = overlap(p1,d_2_2);
+        d_2_2_overlap_p2(end+1) = overlap(p2,d_2_2);
+        d_2_2_energy(end+1) = energy(W, d_2_2, I);
+    end
+    
+    d_2_2_energy_new = energy(W, d_2_2, I);
+    if abs(d_2_2_energy_new - d_2_2_energy_old) < eps
+        break;
+    end
+    d_2_2_energy_old = d_2_2_energy_new;
+end
+
+% plots pattern 2 (d_2_2)
+fig = figure;
+hold on;
+plot((1:size(d_2_2_overlap_p0,2)),d_2_2_overlap_p0);
+plot((1:size(d_2_2_overlap_p1,2)),d_2_2_overlap_p1);
+plot((1:size(d_2_2_overlap_p2,2)),d_2_2_overlap_p2);
+title('Overlaps (pattern 2)');
+xlabel('time')
+ylabel('overlap');
+legend('pattern 0','pattern 1','pattern 2');
+print(fig,'img/distorted_2_2_overlap.png','-dpng');
+hold off;
+fig = figure;
+plot((1:size(d_2_2_energy,2)),d_2_2_energy);
+title('Energy function (pattern 2)');
+xlabel('time')
+ylabel('energy function');
+print(fig,'img/distorted_2_2_energy.png','-dpng');
+fig = figure;
+imagesc([reshape(d2_2,32,32) reshape(d_2_2,32,32)])
+title(sprintf('Pattern 2 reconstructed (hamming distance=%d)',hamming_distance(d_2_2, p2)));
+print(fig,'img/distorted_2_2_reconstructed.png','-dpng');
+
+
+% pattern 2 (d_2_3)
+while(true)
+    % permuting the neurons for random update
+    idxs = randperm(size(W,2));
+    for i = idxs
+        d_2_3(i) = sign(W(i,:) * d_2_3' + I(i));
+        d_2_3_overlap_p0(end+1) = overlap(p0,d_2_3);
+        d_2_3_overlap_p1(end+1) = overlap(p1,d_2_3);
+        d_2_3_overlap_p2(end+1) = overlap(p2,d_2_3);
+        d_2_3_energy(end+1) = energy(W, d_2_3, I);
+    end
+    
+    d_2_3_energy_new = energy(W, d_2_3, I);
+    if abs(d_2_3_energy_new - d_2_3_energy_old) < eps
+        break;
+    end
+    d_2_3_energy_old = d_2_3_energy_new;
+end
+
+% plots pattern 2 (d_2_3)
+fig = figure;
+hold on;
+plot((1:size(d_2_3_overlap_p0,2)),d_2_3_overlap_p0);
+plot((1:size(d_2_3_overlap_p1,2)),d_2_3_overlap_p1);
+plot((1:size(d_2_3_overlap_p2,2)),d_2_3_overlap_p2);
+title('Overlaps (pattern 2)');
+xlabel('time')
+ylabel('overlap');
+legend('pattern 0','pattern 1','pattern 2');
+print(fig,'img/distorted_2_3_overlap.png','-dpng');
+hold off;
+fig = figure;
+plot((1:size(d_2_3_energy,2)),d_2_3_energy);
+title('Energy function (pattern 2)');
+xlabel('time')
+ylabel('energy function');
+print(fig,'img/distorted_2_3_energy.png','-dpng');
+fig = figure;
+imagesc([reshape(d2_3,32,32) reshape(d_2_3,32,32)])
+title(sprintf('Pattern 2 reconstructed (hamming distance=%d)',hamming_distance(d_2_3, p2)));
+print(fig,'img/distorted_2_3_reconstructed.png','-dpng');
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function m = overlap(p, x)
     m = (p * x') / size(p, 2);
