@@ -107,10 +107,11 @@ plot(tr.perf);
 xlabel('epochs')
 ylabel('error')
 title('Learning curve TR (design set)');
-print(fig,'idnn/idnn_learning_curve.png','-dpng')
+print(fig,'idnn/idnn_laser_learning_curve.png','-dpng')
 
 
 time = 1:steps;
+time_test = 1:steps_test;
 sz = 25;
 fig = figure;
 tiledlayout(2,1)
@@ -128,11 +129,11 @@ title('TR+VAL target and output signals');
 % Bottom plot
 nexttile
 hold on;
-plot(time,cell2mat(Y_test));  % ground truth
-plot(time,cell2mat(Y_test_pred)); % predictions
+plot(time_test,cell2mat(Y_test));  % ground truth
+plot(time_test,cell2mat(Y_test_pred)); % predictions
 % scatter(time,cell2mat(Y_test),sz);  % ground truth
 % scatter(time,cell2mat(Y_test_pred),sz); % predictions
 hold off;
 legend('target','predictions');
 title('TEST target and output signals');
-print(fig,'idnn/idnn_target_predictions.png','-dpng')
+print(fig,'idnn/idnn_laser_target_predictions.png','-dpng')
