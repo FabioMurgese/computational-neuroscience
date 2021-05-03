@@ -31,7 +31,6 @@ epochs = 100:300:1000;
 [H, L, LR, E] = ndgrid(hiddenSizes,lengths,lrs,epochs);
 grid = [H(:) L(:) LR(:) E(:)];
 
-% min_err_tr = inf;
 min_err_val = inf;
 
 for g = 1:size(grid,1)
@@ -46,7 +45,8 @@ for g = 1:size(grid,1)
     idnn.trainParam.lr = lr;
     idnn.trainParam.epochs = e;
     idnn.performParam.regularization = 0.1; % weight decay regularization
-    idnn.divideFcn = 'dividetrain';  
+    idnn.divideFcn = 'dividetrain';
+    idnn.trainParam.showWindow = false;
     
     % prepare timeseries
     [delayedInput_tr,initialInput_tr,initialStates_tr,delayedTarget_tr] = preparets(idnn,X_train,Y_train);  % TR
@@ -70,10 +70,8 @@ for g = 1:size(grid,1)
         best_h = h;
         best_l = l;
         best_lr = lr;
-        %best_f = f;
         best_e = e;
         
-        best_error_tr = error_tr;
         best_error_val = error_val;
     end
 end
@@ -97,14 +95,14 @@ fprintf('Error on training (design) set: %.5f\n', error_tr);
 
 Y_test_pred = idnn(X_test);
 error_test = immse(cell2mat(Y_test), cell2mat(Y_test_pred));
-fprintf('Error on test set: %.5f', error_test);
+fprintf('Error on test set: %.5f\n', error_test);
 
 fig = figure;
 plot(tr.perf);
 xlabel('epochs')
 ylabel('error')
 title('Learning curve TR (design set)');
-print(fig,'img/idnn_learning_curve.png','-dpng')
+print(fig,'idnn/idnn_learning_curve.png','-dpng')
 
 
 time = 1:steps;
@@ -132,4 +130,4 @@ plot(time,cell2mat(Y_test_pred)); % predictions
 hold off;
 legend('target','predictions');
 title('TEST target and output signals');
-print(fig,'img/idnn_target_predictions.png','-dpng')
+print(fig,'idnn/idnn_target_predictions.png','-dpng')

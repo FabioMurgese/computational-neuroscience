@@ -1,0 +1,13 @@
+SRNN hyper-parameters
+hidden sizes = [10 40 70 100]
+layer delays = 1
+learning rates = [0.0001 0.001 0.01 0.1]
+epochs = [100 400 700 1000]
+function = 'traingdx'
+
+Best configuration:
+hidden size: 70 learning rate: 0.001 epochs: 1000
+
+Error on VAL = 0.002274206892391
+Error on TR (design set) = 0.002023528506655
+Error on TEST = 0.001852437375885
