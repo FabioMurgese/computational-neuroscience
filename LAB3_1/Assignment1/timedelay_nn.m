@@ -1,16 +1,11 @@
 %%%%%%%%%%%%%%% Time Delay Neural Network %%%%%%%%%%%%%%%
 clear variables;
 
-load laser_dataset; % import data
-allData = cell2mat(laserTargets);
-allData = rescale(allData,-1,1);
-inputData = allData(1:end-1);
-input = num2cell(inputData);
-targetData = allData(2:end);
-target = num2cell(targetData);
+load('NARMA10timeseries.mat');  % import data
+input = NARMA10timeseries.input;
+target = NARMA10timeseries.target;
 
 steps = 5000;
-steps_test = length(inputData)-steps;
 val_steps = 4000;
 
 % design set
