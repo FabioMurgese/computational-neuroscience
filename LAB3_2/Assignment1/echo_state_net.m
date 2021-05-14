@@ -107,12 +107,13 @@ for g = 1:size(grid,1)
     fprintf('\n#%d/%d: ', g, size(grid,1));
 end
 
-[value, idx] = min(Ers_val);
+[val_mse, idx] = min(Ers_val);
+tr_mse = Ers_tr(idx);
 omega_in = grid(g,1);
 Nr = grid(g,2);
 rho = grid(g,3);
 l = grid(g,4);
-fprintf('\nBest hyper-params:\nInput scaling: %.2f - Reservoir dimension: %d - Spectral radius: %.2f - Lambda: %.4f\nTraining MSE: %.5f\nValidation MSE: %.5f\n', grid(idx,1), grid(idx,2), grid(idx,3), grid(idx,4), Ers_tr(idx), value);
+fprintf('\nBest hyper-params:\nInput scaling: %.2f - Reservoir dimension: %d - Spectral radius: %.2f - Lambda: %.4f\nTraining MSE: %.5f\nValidation MSE: %.5f\n', grid(idx,1), grid(idx,2), grid(idx,3), grid(idx,4), tr_mse, val_mse);
 % fprintf('\nBest hyper-params:\nInput scaling: %.2f - Reservoir dimension: %d Spectral radius: %.2f - Lambda: %.4f - Connectivity percentage: %.2f\nValidation error: %.5f\n', grid(idx,1), grid(idx,2), grid(idx,3), grid(idx,4), grid(idx,5), value);
 
 % model assessment
@@ -155,17 +156,18 @@ end
 H_test = [H_test;ones(1,size(H_test,2))];
 % compute the output and error (loss) for the validation samples
 Y_test_pred = V * H_test;
-error_test = immse(Y_test,Y_test_pred);
-fprintf('Test MSE: %.5f\n', error_test);
-
+test_mse = immse(Y_test,Y_test_pred);
+fprintf('Test MSE: %.5f\n', test_mse);
+save('results.mat','tr_mse','val_mse','test_mse','U','W','V','omega_in','Nr','rho','l','Nu')
 
 time = 1:steps;
+Y_design_shift = Y_design(:,Nr+1:end);
 fig = figure;
 tiledlayout(2,1)
 % Top plot
 nexttile
 hold on;
-plot(time,Y_design);  % ground truth
+plot(1:size(Y_design_shift,2),Y_design_shift);  % ground truth
 plot(1:size(Y_tr_pred,2),Y_tr_pred); % predictions
 hold off;
 legend('target','predictions');
@@ -179,4 +181,5 @@ plot(time,Y_test_pred); % predictions
 hold off;
 legend('target','predictions');
 title('TEST target and output signals');
+savefig('esn_target_predictions')
 print(fig,'esn_target_predictions.png','-dpng')
