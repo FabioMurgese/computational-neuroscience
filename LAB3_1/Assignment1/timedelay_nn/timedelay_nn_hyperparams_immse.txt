@@ -5,6 +5,7 @@ learning rates = [0.0001 0.001 0.01 0.1]
 momentum = [0.7 0.8 0.9]
 epochs = [100 400 700 1000]
 function = 'traingdx'
+weight decay regularization = 0.1
 
 Best configuration:
 hidden size: 40 input delays: 3 learning rate: 0.01 momentum: 0.8 epochs:700

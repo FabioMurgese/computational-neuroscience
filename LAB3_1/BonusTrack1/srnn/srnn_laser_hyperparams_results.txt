@@ -1,0 +1,15 @@
+Recurrent NN hyper-parameters for grid-serch - Laser task
+hidden sizes = [10 40 70 100]
+layer delays = 1
+learning rates = [0.0001 0.001 0.01 0.1]
+epochs = [100 400 700 1000]
+function = 'traingdx'
+weight decay regularization = 0.1
+
+Best configuration:
+hidden size: 10 learning rate: 0.0001 epochs: 1000
+
+Error on TR = 0.005217834284005
+Error on VAL = 0.006101832572854
+Error on TR+VAL = 0.005382178341202
+Error on TEST = 0.005569138260656
