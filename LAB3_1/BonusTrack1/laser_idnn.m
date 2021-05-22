@@ -46,7 +46,7 @@ for g = 1:size(grid,1)
     l = grid(g,2);
     lr = grid(g,3);
     e = grid(g,4);
-    fprintf('Hidden size: %d - Window length: %d - Learning rate: %.4f - Epochs: %d\n', h, l, lr, e);
+    fprintf('Hidden size: %d - Window length: %d - Learning rate: %.4f - Epochs: %d\n',h,l,lr,e);
     
     idnn = timedelaynet(1:l,h,'traingdx');
     idnn.trainParam.lr = lr;

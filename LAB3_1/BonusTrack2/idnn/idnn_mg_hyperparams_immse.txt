@@ -1,0 +1,15 @@
+Time Delay NN hyper-parameters for grid search - MG task
+hidden sizes = [10 40 70 100]
+input delays = [2 3 4]
+learning rates = [0.0001 0.001 0.01 0.1]
+epochs = [100 400 700 1000]
+function = 'traingdx'
+weight decay regularization = 0.1
+
+Best configuration:
+hidden size: 40 input delays: 2 learning rate: 0.0001 epochs:700
+
+Error on TR = 2.633770714381047e-04
+Error on VAL = 4.886207391231716e-04
+Error on TR+VAL = 0.001358791074604
+Error on TEST = 0.001359245223641

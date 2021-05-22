@@ -1,4 +1,4 @@
-%%%%%%%%%%%%%%% Recurrent Neural Network %%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Recurrent Neural Network - MG task %%%%%%%%%%%%%%%
 clear variables;
 
 load('MGtimeseries.mat');  % import data
@@ -35,14 +35,16 @@ epochs = 100:300:1000;
 [H, LR, E] = ndgrid(hiddenSizes,lrs,epochs);
 grid = [H(:) LR(:) E(:)];
 
-min_err_val = inf;
+Ers_tr = [];
+Ers_val = [];
 
 for g = 1:size(grid,1)
     
+    fprintf('\n#%d/%d: ', g, size(grid,1));
     h = grid(g,1);
     lr = grid(g,2);
     e = grid(g,3);
-    fprintf('Hidden size: %d - Learning rate: %.4f - Epochs: %d\n', h, lr, e);
+    fprintf('Hidden size: %d - Learning rate: %.4f - Epochs: %d\n',h,lr,e);
     
     srnn = layrecnet(1,h,'traingdx');
     srnn.trainParam.lr = lr;
@@ -62,28 +64,26 @@ for g = 1:size(grid,1)
     % computing immse on TR and VAL
     Y_tr_pred = srnn(X_train);
     error_tr = immse(cell2mat(Y_train), cell2mat(Y_tr_pred));
+    Ers_tr(end+1) = error_tr;
     fprintf('Error on training set: %.5f\n', error_tr);
     
     Y_val_pred = srnn(X_val);
     error_val = immse(cell2mat(Y_val), cell2mat(Y_val_pred));
+    Ers_val(end+1) = error_val;
     fprintf('Error on validation set: %.5f\n\n', error_val);
-    
-    if error_val < min_err_val
-        min_err_val = error_val;
-        min_err_tr = error_tr;
-        best_h = h;
-        best_lr = lr;
-        best_e = e;
-        
-        best_error_val = error_val;
-    end
 end
 
+[val_mse, idx] = min(Ers_val);
+tr_mse = Ers_tr(idx);
+h = grid(idx,1);
+lr = grid(idx,2);
+e = grid(idx,3);
+fprintf('\nBest hyper-params:\nHidden size: %d - Learning rate: %.4f - Epochs: %d\nTraining MSE: %.5f\nValidation MSE: %.5f\n',h,lr,e,tr_mse,val_mse);
+
 % model assessment
-fprintf('Best configuration:\nHidden size: %d - Learning rate: %.4f - Epochs: %d\n', best_h, best_lr, best_e);
-srnn = layrecnet(1,best_h,'traingdx');
-srnn.trainParam.lr = best_lr;
-srnn.trainParam.epochs = best_e;
+srnn = layrecnet(1,h,'traingdx');
+srnn.trainParam.lr = lr;
+srnn.trainParam.epochs = e;
 srnn.performParam.regularization = 0.1; % weight decay regularization
 srnn.divideFcn = 'dividetrain';    
 
@@ -91,35 +91,32 @@ srnn.divideFcn = 'dividetrain';
 [srnn, tr] = train(srnn,delayedInput,delayedTarget,initialInput,initialStates,'UseParallel','yes');
 view(srnn)
 
-% computing immse on TR (design) and TEST
+% computing immse on TR+VAL (design) and TEST
 Y_tr_pred = srnn(X_design);
-error_tr = immse(cell2mat(Y_design), cell2mat(Y_tr_pred));
-fprintf('Error on training (design) set: %.5f\n', error_tr);
+design_mse = immse(cell2mat(Y_design), cell2mat(Y_tr_pred));
+fprintf('Design (TR+VAL) MSE: %.5f\n', design_mse);
 
 Y_test_pred = srnn(X_test);
-error_test = immse(cell2mat(Y_test), cell2mat(Y_test_pred));
-fprintf('Error on test set: %.5f\n', error_test);
+test_mse = immse(cell2mat(Y_test), cell2mat(Y_test_pred));
+fprintf('Test MSE: %.5f\n', test_mse);
 
 fig = figure;
 plot(tr.perf);
 xlabel('epochs')
 ylabel('error')
 title('Learning curve TR (design set)');
+savefig('srnn/srnn_mg_learning_curve')
 print(fig,'srnn/srnn_mg_learning_curve.png','-dpng')
 
+save('srnn/outputs.mat','tr_mse','val_mse','design_mse','test_mse','srnn','tr')
 
-time = 1:steps;
-time_test = 1:steps_test;
-sz = 25;
 fig = figure;
 tiledlayout(2,1)
 % Top plot
 nexttile
 hold on;
-plot(time,cell2mat(Y_design));  % ground truth
-plot(time,cell2mat(Y_tr_pred)); % predictions
-% scatter(time,cell2mat(Y_design),sz);  % ground truth
-% scatter(time,cell2mat(Y_tr_pred),sz); % predictions
+plot(1:size(cell2mat(Y_design),2),cell2mat(Y_design));  % ground truth
+plot(1:size(cell2mat(Y_tr_pred),2),cell2mat(Y_tr_pred)); % predictions
 hold off;
 legend('target','predictions');
 title('TR+VAL target and output signals');
@@ -127,11 +124,10 @@ title('TR+VAL target and output signals');
 % Bottom plot
 nexttile
 hold on;
-plot(time_test,cell2mat(Y_test));  % ground truth
-plot(time_test,cell2mat(Y_test_pred)); % predictions
-% scatter(time_test,cell2mat(Y_test),sz);  % ground truth
-% scatter(time_test,cell2mat(Y_test_pred),sz); % predictions
+plot(1:size(cell2mat(Y_test),2),cell2mat(Y_test));  % ground truth
+plot(1:size(cell2mat(Y_test_pred),2),cell2mat(Y_test_pred)); % predictions
 hold off;
 legend('target','predictions');
 title('TEST target and output signals');
+savefig('srnn/srnn_mg_target_predictions')
 print(fig,'srnn/srnn_mg_target_predictions.png','-dpng')

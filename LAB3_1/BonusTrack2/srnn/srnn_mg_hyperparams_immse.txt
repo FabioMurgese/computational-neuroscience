@@ -1,0 +1,15 @@
+Recurrent NN hyper-parameters for grid-serch - MG task
+hidden sizes = [10 40 70 100]
+input delays = [2 3 4]
+learning rates = [0.0001 0.001 0.01 0.1]
+epochs = [100 400 700 1000]
+function = 'traingdx'
+weight decay regularization = 0.1
+
+Best configuration:
+hidden size: 10 learning rate: 0.001 epochs: 1000
+
+Error on TR = 3.806136911968542e-04
+Error on VAL = 3.973326934781287e-04
+Error on TR+VAL = 3.755952207532334e-04
+Error on TEST = 3.737964815334499e-04
