@@ -26,25 +26,30 @@ hiddenSizes = 10:30:100;
 lengths = [2 3 4];
 lrs = [0.0001 0.001 0.01 0.1];
 %functions = ['traingdm' 'traingdx' 'trainrp'];
+momentums = [0.7 0.8 0.9];
 epochs = 100:300:1000;
 
-[H, L, LR, E] = ndgrid(hiddenSizes,lengths,lrs,epochs);
-grid = [H(:) L(:) LR(:) E(:)];
+[H, L, LR, M, E] = ndgrid(hiddenSizes,lengths,lrs,momentums,epochs);
+grid = [H(:) L(:) LR(:) M(:) E(:)];
 
-min_err_val = inf;
+Ers_tr = [];
+Ers_val = [];
 
 for g = 1:size(grid,1)
     
+    fprintf('\n#%d/%d: ', g, size(grid,1));
     h = grid(g,1);
     l = grid(g,2);
     lr = grid(g,3);
-    e = grid(g,4);
-    fprintf('Hidden size: %d - Window length: %d - Learning rate: %.4f - Epochs: %d\n', h, l, lr, e);
+    m = grid(g,4);
+    e = grid(g,5);
+    fprintf('Hidden size: %d - Window length: %d - Learning rate: %.4f - Momentum: %.1f - Epochs: %d\n',h,l,lr,m,e);
     
     idnn = timedelaynet(1:l,h,'traingdx');
     idnn.trainParam.lr = lr;
     idnn.trainParam.epochs = e;
-    idnn.performParam.regularization = 0.1; % weight decay regularization
+    idnn.performParam.regularization = 0.1;  % weight decay regularization
+    idnn.trainParam.mc = m;
     idnn.divideFcn = 'dividetrain';
     idnn.trainParam.showWindow = false;
     
@@ -59,63 +64,62 @@ for g = 1:size(grid,1)
     % computing immse on TR and VAL
     Y_tr_pred = idnn(X_train);
     error_tr = immse(cell2mat(Y_train), cell2mat(Y_tr_pred));
+    Ers_tr(end+1) = error_tr;
     fprintf('Error on training set: %.5f\n', error_tr);
     
     Y_val_pred = idnn(X_val);
     error_val = immse(cell2mat(Y_val), cell2mat(Y_val_pred));
+    Ers_val(end+1) = error_val;
     fprintf('Error on validation set: %.5f\n\n', error_val);
-    
-    if error_val < min_err_val
-        min_err_val = error_val;
-        best_h = h;
-        best_l = l;
-        best_lr = lr;
-        best_e = e;
-        
-        best_error_val = error_val;
-    end
 end
 
+[val_mse, idx] = min(Ers_val);
+tr_mse = Ers_tr(idx);
+h = grid(idx,1);
+l = grid(idx,2);
+lr = grid(idx,3);
+m = grid(idx,4);
+e = grid(idx,5);
+fprintf('\nBest hyper-params:\nHidden size: %d - Window length: %d - Learning rate: %.4f - Momentum: %.1f - Epochs: %d\nTraining MSE: %.5f\nValidation MSE: %.5f\n',h,l,lr,m,e,tr_mse,val_mse);
+
 % model assessment
-fprintf('Best configuration:\nHidden size: %d - Window length: %d - Learning rate: %.4f - Epochs: %d\n', best_h, best_l, best_lr, best_e);
-idnn = timedelaynet(1:best_l,best_h,'traingdx');
-idnn.trainParam.lr = best_lr;
-idnn.trainParam.epochs = best_e;
+idnn = timedelaynet(1:l,h,'traingdx');
+idnn.trainParam.lr = lr;
+idnn.trainParam.epochs = e;
 idnn.performParam.regularization = 0.1; % weight decay regularization
+idnn.trainParam.mc = m;
 idnn.divideFcn = 'dividetrain';    
 
 [delayedInput,initialInput,initialStates,delayedTarget] = preparets(idnn,X_design,Y_design);
 [idnn, tr] = train(idnn,delayedInput,delayedTarget,initialInput,initialStates,'UseParallel','yes');
 view(idnn)
 
-% computing immse on TR (design) and TEST
-Y_tr_pred = idnn(X_design);
-error_tr = immse(cell2mat(Y_design), cell2mat(Y_tr_pred));
-fprintf('Error on training (design) set: %.5f\n', error_tr);
+% computing immse on TR+VAL (design) and TEST
+Y_design_pred = idnn(X_design);
+design_mse = immse(cell2mat(Y_design), cell2mat(Y_design_pred));
+fprintf('Design (TR+VAL) MSE: %.5f\n', design_mse);
 
 Y_test_pred = idnn(X_test);
-error_test = immse(cell2mat(Y_test), cell2mat(Y_test_pred));
-fprintf('Error on test set: %.5f\n', error_test);
+test_mse = immse(cell2mat(Y_test), cell2mat(Y_test_pred));
+fprintf('Test MSE: %.5f\n', test_mse);
 
 fig = figure;
 plot(tr.perf);
 xlabel('epochs')
 ylabel('error')
 title('Learning curve TR (design set)');
-print(fig,'idnn/idnn_learning_curve.png','-dpng')
+savefig('timedelay_nn/timedelay_nn_learning_curve')
+print(fig,'timedelay_nn/timedelay_nn_learning_curve.png','-dpng')
 
+save('timedelay_nn/outputs.mat','tr_mse','val_mse','design_mse','test_mse','idnn','tr')
 
-time = 1:steps;
-sz = 25;
 fig = figure;
 tiledlayout(2,1)
 % Top plot
 nexttile
 hold on;
-plot(time,cell2mat(Y_design));  % ground truth
-plot(time,cell2mat(Y_tr_pred)); % predictions
-% scatter(time,cell2mat(Y_design),sz);  % ground truth
-% scatter(time,cell2mat(Y_tr_pred),sz); % predictions
+plot(1:size(cell2mat(Y_design),2),cell2mat(Y_design));  % ground truth
+plot(1:size(cell2mat(Y_design_pred),2),cell2mat(Y_design_pred)); % predictions
 hold off;
 legend('target','predictions');
 title('TR+VAL target and output signals');
@@ -123,11 +127,10 @@ title('TR+VAL target and output signals');
 % Bottom plot
 nexttile
 hold on;
-plot(time,cell2mat(Y_test));  % ground truth
-plot(time,cell2mat(Y_test_pred)); % predictions
-% scatter(time,cell2mat(Y_test),sz);  % ground truth
-% scatter(time,cell2mat(Y_test_pred),sz); % predictions
+plot(1:size(cell2mat(Y_test),2),cell2mat(Y_test));  % ground truth
+plot(1:size(cell2mat(Y_test_pred),2),cell2mat(Y_test_pred)); % predictions
 hold off;
 legend('target','predictions');
 title('TEST target and output signals');
-print(fig,'idnn/idnn_target_predictions.png','-dpng')
+savefig('timedelay_nn/timedelay_nn_target_predictions')
+print(fig,'timedelay_nn/timedelay_nn_target_predictions.png','-dpng')
