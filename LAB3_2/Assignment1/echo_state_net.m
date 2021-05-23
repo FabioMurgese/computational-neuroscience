@@ -38,11 +38,11 @@ Ers_val = [];
 
 for g = 1:size(grid,1)
     
+    fprintf('\n#%d/%d: ', g, size(grid,1));
     omega_in = grid(g,1);
     Nr = grid(g,2);
     rho = grid(g,3);
     l = grid(g,4);
-%     c = grid(g,5);
     
     guesses = 10;  % network guesses for each reservoir hyper-parametrization
     Nu = size(X_train,1);
@@ -51,10 +51,9 @@ for g = 1:size(grid,1)
     E_trs = [];
     E_vals = [];
     
-    fprintf('Input scaling: %.2f - Reservoir dimension: %d Spectral radius: %.2f - Lambda: %.4f\n', omega_in, Nr, rho, l);
-%     fprintf('Input scaling: %.2f - Reservoir dimension: %d Spectral radius: %.2f - Lambda: %.4f - Connectivity percentage: %.2f\n', omega_in, Nr, rho, l, c);
+    fprintf('Input scaling: %.2f - Reservoir dimension: %d Spectral radius: %.2f - Lambda: %.4f\n',omega_in,Nr,rho,l);
     
-    for n = 1:guesses        
+    for n = 1:guesses
         % initialize the input-to-reservoir matrix
         U = 2*rand(Nr,Nu+1)-1;
         U = omega_in * U;
@@ -98,13 +97,13 @@ for g = 1:size(grid,1)
         E_vals(end+1) = err_val;
        
     end
+    
     error_tr = mean(E_trs);
     Ers_tr(end+1) = error_tr;
     fprintf('Error on training set: %.5f\n', error_tr);
     error_val = mean(E_vals);
     Ers_val(end+1) = error_val;
     fprintf('Error on validation set: %.5f\n\n', error_val);
-    fprintf('\n#%d/%d: ', g, size(grid,1));
 end
 
 [val_mse, idx] = min(Ers_val);
@@ -114,53 +113,64 @@ Nr = grid(idx,2);
 rho = grid(idx,3);
 l = grid(idx,4);
 fprintf('\nBest hyper-params:\nInput scaling: %.2f - Reservoir dimension: %d - Spectral radius: %.2f - Lambda: %.4f\nTraining MSE: %.5f\nValidation MSE: %.5f\n', grid(idx,1), grid(idx,2), grid(idx,3), grid(idx,4), tr_mse, val_mse);
-% fprintf('\nBest hyper-params:\nInput scaling: %.2f - Reservoir dimension: %d Spectral radius: %.2f - Lambda: %.4f - Connectivity percentage: %.2f\nValidation error: %.5f\n', grid(idx,1), grid(idx,2), grid(idx,3), grid(idx,4), grid(idx,5), value);
 
 % model assessment
 Nu = size(X_design,1);
 designSteps = size(X_design,2);
 testSteps = size(X_test,2);
-% initialize the input-to-reservoir matrix
-U = 2*rand(Nr,Nu+1)-1;
-U = omega_in * U;
-% initialize the inter-reservoir weight matrices
-W = 2*rand(Nr,Nr) - 1;
-W = rho * (W / max(abs(eig(W))));
-state = zeros(Nr,1);
-H = [];
 
-% run the reservoir on the input stream
-for t = 1:designSteps
-    state = tanh(U * [X_design(t);1] + W * state);
-    H(:,end+1) = state;
-end
-% discard the washout
-H = H(:,Nr+1:end);
-% add the bias
-H = [H;ones(1,size(H,2))];
-% update the target matrix dimension
-D = Y_design(:,Nr+1:end);
-% train the readout
-V = D*H'*inv(H*H'+ l * eye(Nr+1));
-% compute the output
-Y_tr_pred = V * H;
+Ers_design = [];
+Ers_test = [];
 
-state = zeros(Nr,1);
-H_test = [];
-% run the reservoir on the test stream
-for t = 1:testSteps
-    state = tanh(U * [X_test(t);1] + W * state);
-    H_test(:,end+1) = state;
+for n = 1:guesses
+    % initialize the input-to-reservoir matrix
+    U = 2*rand(Nr,Nu+1)-1;
+    U = omega_in * U;
+    % initialize the inter-reservoir weight matrices
+    W = 2*rand(Nr,Nr) - 1;
+    W = rho * (W / max(abs(eig(W))));
+    state = zeros(Nr,1);
+    H = [];
+
+    % run the reservoir on the input stream
+    for t = 1:designSteps
+        state = tanh(U * [X_design(t);1] + W * state);
+        H(:,end+1) = state;
+    end
+    % discard the washout
+    H = H(:,Nr+1:end);
+    % add the bias
+    H = [H;ones(1,size(H,2))];
+    % update the target matrix dimension
+    D = Y_design(:,Nr+1:end);
+    % train the readout
+    V = D*H'*inv(H*H'+ l * eye(Nr+1));
+    % compute the output
+    Y_design_pred = V * H;
+    design_mse = immse(Y_design(:,Nr+1:end),Y_design_pred);
+    Ers_design(end+1) = design_mse;
+
+    state = zeros(Nr,1);
+    H_test = [];
+    % run the reservoir on the test stream
+    for t = 1:testSteps
+        state = tanh(U * [X_test(t);1] + W * state);
+        H_test(:,end+1) = state;
+    end
+    % add the bias
+    H_test = [H_test;ones(1,size(H_test,2))];
+    % compute the output and error (loss) for the validation samples
+    Y_test_pred = V * H_test;
+    test_mse = immse(Y_test,Y_test_pred);
+    Ers_test(end+1) = test_mse;
 end
-% add the bias
-H_test = [H_test;ones(1,size(H_test,2))];
-% compute the output and error (loss) for the validation samples
-Y_test_pred = V * H_test;
-test_mse = immse(Y_test,Y_test_pred);
+
+design_mse = mean(Ers_design);
+fprintf('Design MSE: %.5f\n', design_mse);
+test_mse = mean(Ers_test);
 fprintf('Test MSE: %.5f\n', test_mse);
-save('outputs.mat','tr_mse','val_mse','test_mse','U','W','V','omega_in','Nr','rho','l','Nu')
+save('outputs.mat','tr_mse','val_mse','design_mse','test_mse','U','W','V','omega_in','Nr','rho','l','Nu')
 
-time = 1:steps;
 Y_design_shift = Y_design(:,Nr+1:end);
 fig = figure;
 tiledlayout(2,1)
@@ -168,7 +178,7 @@ tiledlayout(2,1)
 nexttile
 hold on;
 plot(1:size(Y_design_shift,2),Y_design_shift);  % ground truth
-plot(1:size(Y_tr_pred,2),Y_tr_pred); % predictions
+plot(1:size(Y_design_pred,2),Y_design_pred); % predictions
 hold off;
 legend('target','predictions');
 title('TR+VAL target and output signals');
@@ -176,8 +186,8 @@ title('TR+VAL target and output signals');
 % Bottom plot
 nexttile
 hold on;
-plot(time,Y_test);  % ground truth
-plot(time,Y_test_pred); % predictions
+plot(1:size(Y_test,2),Y_test);  % ground truth
+plot(1:size(Y_test_pred,2),Y_test_pred); % predictions
 hold off;
 legend('target','predictions');
 title('TEST target and output signals');

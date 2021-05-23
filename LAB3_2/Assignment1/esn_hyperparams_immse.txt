@@ -3,10 +3,19 @@ input scaling (omega_in) = [0.5 1 2]
 reservoir dimension (Nrs) = [5 10 25 50 100 200]
 spectral radius (rho_values) = [0.1 0.5 0.9 1.2 2]
 lambdas = [0.0001 0.001 0.01 0.1]
+Nu = 1
 
 Best configuration:
-Input scaling: 2.00 - Reservoir dimension: 200 - Spectral radius: 2.00 - Lambda: 0.1000
+Input scaling: 0.50 - Reservoir dimension: 200 - Spectral radius: 0.90 - Lambda: 0.1
 
-Training MSE: 0.002193589521792
-Validation MSE: 0.003207003884526
-Test MSE: 0.002452793944810
+Training MSE: 		0.001067914315993
+Validation MSE: 	0.003627279008297
+Design (TR+VAL) MSE: 	0.001108840708603
+Test MSE: 		0.001807921906778
+
+outputs.mat contains:
+- U (input-to-reservoir weight matrix)
+- W (recurrent reservoir weight matrix)
+- V (reservoir-to-readout weight matrix)
+- best hyper-params
+- MSE on TR, VAL, TR+VAL, TEST
