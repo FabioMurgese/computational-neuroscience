@@ -4,7 +4,7 @@ clear variables;
 data = readtable('../lab2_1_data.csv');  % importing data as table
 U = table2array(data);  % converting table into input array
 U_size = size(U,2);  % training set dimension
-eta = 5*10e-6;  % learning rate
+eta = 1*10e-2;  % learning rate
 epochs=1000;  % iterations
 %theta = 2*10e-5;  % threshold for early stopping
 %theta = NaN;
