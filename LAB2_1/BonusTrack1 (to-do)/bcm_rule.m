@@ -4,10 +4,9 @@ clear variables;
 data = readtable('../lab2_1_data.csv');  % importing data as table
 U = table2array(data);  % converting table into input array
 U_size = size(U,2);  % training set dimension
-eta = 1*10e-2;  % learning rate
+eta = 1*10e-6;  % learning rate
 epochs=1000;  % iterations
-%theta = 2*10e-5;  % threshold for early stopping
-%theta = NaN;
+theta = -1;
 Q = U*U';  % input correlation matrix
 weights = [];
 
@@ -23,15 +22,12 @@ for i = 1:epochs
         % linear firing model
         u = U(:,n);
         v = w' * u;  % compute output
-        vs = [vs; v];  % save all v to compute theta
-        theta = mean(vs);
         delta_w = v  * u * (v - theta);
         w = w + eta * delta_w;  % update weights
+        theta = v^2 - theta;  % update theta
     end
     
-    theta = v^2 - theta;  % update theta
     weights(:,i) = w/norm(w);
-    
     w_norm_new = norm(w);
     W_norm = [W_norm; w_norm_new];
     diff = w_norm_new - w_norm;
