@@ -17,7 +17,7 @@ W_norm = [];
 
 for i = 1:epochs
     U = U(:,randperm(U_size));  % reshuffling dataset
-    w_norm = norm(w);
+    w_temp = w;
     
     for n = 1:U_size
         % linear firing model
@@ -27,13 +27,11 @@ for i = 1:epochs
         w = w + eta * delta_w;  % update weights
     end
     
-    weights(:,i) = w/norm(w);
+    weights = [weights; w];
+    W_norm = [W_norm; norm(w)];
+    diff = norm(w - w_temp);
     
-    w_norm_new = norm(w);
-    W_norm = [W_norm; w_norm_new];
-    diff = w_norm_new - w_norm;
-    
-    fprintf('Epoch: %d Norm(W): %1.5f Diff: %1.7f Theta: %1.7f \n', i, w_norm, diff, theta)
+    fprintf('Epoch: %d Norm(W): %1.5f Diff: %1.7f Theta: %1.7f \n', i, norm(w), diff, theta)
     
     if diff < theta  % stop condition
         break;
@@ -56,11 +54,12 @@ legend('data points','principal eigenvector','weight vector','Location', 'best')
 title('P1: data points, final weight vector and principal eigenvector of Q');
 print(fig,'P1.png','-dpng')
 
+w1 = weights(1:2:end);
+w2 = weights(2:2:end);
 
-x=(1:1:length(weights));  % epochs time array
 % weight over time, first component
 fig = figure;
-plot(x, weights(1,:));
+plot(w1)
 xlabel('time')
 ylabel('weight')
 title('Weight vector over time (1st component)')
@@ -68,7 +67,7 @@ print(fig,'P2.1.png','-dpng')
 
 % weight over time, second component
 fig = figure;
-plot(x, weights(2,:))
+plot(w2)
 xlabel('time')
 ylabel('weight')
 title('Weight vector over time (2nd component)')
@@ -76,7 +75,7 @@ print(fig,'P2.2.png','-dpng')
 
 % weight norm over time
 fig = figure;
-plot(x, W_norm)
+plot(1:size(W_norm,1), W_norm)
 xlabel('time')
 ylabel('weight')
 title('Weight norm vector over time')
