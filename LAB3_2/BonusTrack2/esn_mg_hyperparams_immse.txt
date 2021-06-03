@@ -1,0 +1,21 @@
+ESN MG task hyper-parameters for grid-search
+input scaling (omega_in) = [0.5 1 2]
+reservoir dimension (Nrs) = [5 10 25 50 100 200]
+spectral radius (rho_values) = [0.1 0.5 0.9 1.2 2]
+lambdas = [0.0001 0.001 0.01 0.1]
+Nu = 1
+
+Best configuration:
+Input scaling: 2.00 - Reservoir dimension: 50 - Spectral radius: 0.10 - Lambda: 0.001
+
+Training MSE: 		2.439138450386928e-05
+Validation MSE: 	1.084904533239540e-04
+Design (TR+VAL) MSE: 	2.347563148339527e-05
+Test MSE: 		3.818573804837168e-05
+
+outputs.mat contains:
+- U (input-to-reservoir weight matrix)
+- W (recurrent reservoir weight matrix)
+- V (reservoir-to-readout weight matrix)
+- best hyper-params
+- MSE on TR, VAL, TR+VAL, TEST

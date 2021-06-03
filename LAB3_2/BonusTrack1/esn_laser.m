@@ -1,11 +1,14 @@
-%%%%%%%%%%%%%%% Echo State Network %%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Echo State Network - Laser task %%%%%%%%%%%%%%%
 clear variables;
 
-load('NARMA10timeseries.mat');  % import data
-input = cell2mat(NARMA10timeseries.input);
-target = cell2mat(NARMA10timeseries.target);
+load laser_dataset; % import data
+allData = cell2mat(laserTargets);
+allData = rescale(allData,-1,1);
+input = allData(1:end-1);
+target = allData(2:end);
 
 steps = 5000;
+steps_test = length(input)-steps;
 val_steps = 4000;
 
 % design set

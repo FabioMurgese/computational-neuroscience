@@ -1,11 +1,13 @@
-%%%%%%%%%%%%%%% Echo State Network %%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%% Echo State Network - MG task%%%%%%%%%%%%%%%
 clear variables;
 
-load('NARMA10timeseries.mat');  % import data
-input = cell2mat(NARMA10timeseries.input);
-target = cell2mat(NARMA10timeseries.target);
+load('MGtimeseries.mat');  % import data
+allData = cell2mat(MGtimeseries);
+input = allData(1:end-1);
+target = allData(2:end);
 
 steps = 5000;
+steps_test = length(input)-steps;
 val_steps = 4000;
 
 % design set
