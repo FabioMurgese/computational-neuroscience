@@ -87,7 +87,7 @@ for p = 1:size(L,1)
     print(fig,sprintf('img/distorted_%d_%0.2f_energy.png', L(p,1), L(p,2)),'-dpng');
     fig = figure;
     imagesc([reshape(O(p,:),32,32) reshape(U(p,:),32,32)])
-    title(sprintf('Pattern %d reconstructed (hamming distance=%d)', L(p,1), hamming_distance(U(p,:), patterns(p,:))));
+    title(sprintf('Pattern %d reconstructed (hamming distance=%d) (overlap=%.2f)', L(p,1), hamming_distance(U(p,:), patterns(p,:)), overlap(patterns(p,:),U(p,:))));
     print(fig,sprintf('img/distorted_%d_%0.2f_reconstructed.png', L(p,1), L(p,2)),'-dpng');
 end
 
